@@ -3,19 +3,26 @@
 import {
   ArrowUpRight,
   Box,
+  Compass,
+  FastForward,
   MapPin,
   MessageCircle,
+  Star,
   UtensilsCrossed,
 } from "lucide-react";
+import { ROUTE_STAGE_LABELS } from "@/lib/config/routeWaypoints";
 import { buildWhatsAppUrl } from "@/lib/engine/whatsappLink";
 import { useCafeStore } from "@/store/useCafeStore";
 import { xrStore } from "@/components/scene/CafeCanvas";
 
 export function HeroOverlay() {
   const explorationMode = useCafeStore((s) => s.explorationMode);
+  const routeStage = useCafeStore((s) => s.routeStage);
   const contextHint = useCafeStore((s) => s.contextHint);
   const arCapability = useCafeStore((s) => s.arCapability);
   const enterExplore = useCafeStore((s) => s.enterExplore);
+  const skipToCafe = useCafeStore((s) => s.skipToCafe);
+  const startJourneyFromHotel = useCafeStore((s) => s.startJourneyFromHotel);
   const setActiveDrawer = useCafeStore((s) => s.setActiveDrawer);
   const launchAr = useCafeStore((s) => s.launchAr);
 
@@ -34,32 +41,67 @@ export function HeroOverlay() {
   };
 
   if (explorationMode === "explore") {
-    return (
-      <div className="pointer-events-none flex w-full flex-col items-center gap-3 px-4 pb-[max(16px,env(safe-area-inset-bottom))] sm:px-6 sm:pb-6">
-        {contextHint && (
-          <div className="hud-glass-elevated rounded-full px-4 py-2 text-xs font-medium text-[#FAF7F2]">
-            {contextHint}
-          </div>
-        )}
+    const stageInfo = ROUTE_STAGE_LABELS[routeStage];
 
-        <div className="flex w-full items-end justify-end sm:justify-between">
+    return (
+      <div className="pointer-events-none flex w-full flex-col items-center gap-2.5 px-4 pb-[max(16px,env(safe-area-inset-bottom))] sm:px-6 sm:pb-6">
+        {/* Harvest Moon Wayfinding Progress Pill */}
+        <div className="pointer-events-auto hud-glass-elevated flex flex-wrap items-center justify-center gap-2 rounded-full px-4 py-2 text-xs text-[#FAF7F2]">
+          <Compass
+            className="h-3.5 w-3.5 text-[#E5A970]"
+            strokeWidth={1.75}
+            aria-hidden="true"
+          />
+          <span className="font-semibold text-[#E5A970] tabular-nums">
+            Step {stageInfo.step}/5
+          </span>
+          <span className="font-medium">{stageInfo.title}</span>
+          {contextHint && (
+            <span className="hidden text-[#D8CEC2] sm:inline">
+              · {contextHint}
+            </span>
+          )}
+        </div>
+
+        <div className="flex w-full items-end justify-end gap-2 sm:justify-between">
           <div className="hidden sm:block" />
           <p className="hud-glass hidden rounded-full px-4 py-2 text-xs text-[#D8CEC2] sm:block">
-            WASD to walk · Drag to look · Click door or seats · Esc to exit
+            WASD / Analog to walk · Drag to orbit · Click door or tables
           </p>
 
-          <button
-            type="button"
-            onClick={handleArClick}
-            className="pointer-events-auto hud-glass-elevated flex min-h-[44px] items-center gap-2 rounded-full px-4 py-2 text-xs font-medium text-[#FAF7F2] transition hover:bg-[#FAF7F2] hover:text-[#14110F] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E5A970] active:scale-[0.97]"
-          >
-            <Box
-              className="h-4 w-4 text-[#E5A970]"
-              strokeWidth={1.5}
-              aria-hidden="true"
-            />
-            <span>View in AR</span>
-          </button>
+          <div className="pointer-events-auto flex items-center gap-2">
+            {routeStage !== "cafe_main" ? (
+              <button
+                type="button"
+                onClick={skipToCafe}
+                className="flex min-h-[44px] items-center gap-1.5 rounded-full bg-[#FAF7F2] px-4 py-2 text-xs font-semibold text-[#14110F] transition hover:bg-[#F2ECE1] active:scale-[0.97]"
+              >
+                <FastForward className="h-3.5 w-3.5" strokeWidth={1.75} />
+                <span>Skip to Cafe (2F)</span>
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={startJourneyFromHotel}
+                className="hud-glass-elevated flex min-h-[44px] items-center gap-1.5 rounded-full px-3.5 py-2 text-xs font-medium text-[#FAF7F2] transition hover:bg-[#FAF7F2] hover:text-[#14110F]"
+              >
+                <span>Start from Hotel Front</span>
+              </button>
+            )}
+
+            <button
+              type="button"
+              onClick={handleArClick}
+              className="hud-glass-elevated flex min-h-[44px] items-center gap-2 rounded-full px-4 py-2 text-xs font-medium text-[#FAF7F2] transition hover:bg-[#FAF7F2] hover:text-[#14110F]"
+            >
+              <Box
+                className="h-4 w-4 text-[#E5A970]"
+                strokeWidth={1.5}
+                aria-hidden="true"
+              />
+              <span className="hidden sm:inline">View in AR</span>
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -71,11 +113,10 @@ export function HeroOverlay() {
 
   return (
     <div className="pointer-events-none flex w-full flex-col items-end gap-3 px-4 pb-[max(14px,env(safe-area-inset-bottom))] sm:px-6 sm:pb-6">
-      {/* Floating AR Trigger */}
       <button
         type="button"
         onClick={handleArClick}
-        className="pointer-events-auto hud-glass-elevated flex min-h-[44px] items-center gap-2 rounded-full px-4 py-2 text-xs font-medium text-[#FAF7F2] transition hover:bg-[#FAF7F2] hover:text-[#14110F] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E5A970] active:scale-[0.97]"
+        className="pointer-events-auto hud-glass-elevated flex min-h-[44px] items-center gap-2 rounded-full px-4 py-2 text-xs font-medium text-[#FAF7F2] transition hover:bg-[#FAF7F2] hover:text-[#14110F]"
       >
         <Box
           className="h-4 w-4 text-[#E5A970]"
@@ -87,16 +128,15 @@ export function HeroOverlay() {
         </span>
       </button>
 
-      {/* Bottom Action Dock */}
       <nav
         aria-label="Primary actions"
-        className="pointer-events-auto hud-glass mx-auto flex w-full max-w-xl flex-col gap-2 rounded-[22px] p-2 sm:w-auto sm:flex-row sm:items-center sm:rounded-full sm:p-1.5"
+        className="pointer-events-auto hud-glass mx-auto flex w-full max-w-2xl flex-col gap-2 rounded-[22px] p-2 sm:w-auto sm:flex-row sm:items-center sm:rounded-full sm:p-1.5"
       >
-        <div className="grid grid-cols-3 gap-1.5 sm:flex sm:items-center">
+        <div className="grid grid-cols-4 gap-1 sm:flex sm:items-center">
           <button
             type="button"
             onClick={() => setActiveDrawer("menu")}
-            className="flex min-h-[44px] items-center justify-center gap-1.5 rounded-full px-3.5 py-2 text-[13px] font-medium text-[#FAF7F2] transition hover:bg-[#FAF7F2]/12 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E5A970] active:scale-[0.97]"
+            className="flex min-h-[44px] items-center justify-center gap-1.5 rounded-full px-3 py-2 text-[13px] font-medium text-[#FAF7F2] transition hover:bg-[#FAF7F2]/12"
           >
             <UtensilsCrossed
               className="h-4 w-4 text-[#D8CEC2]"
@@ -108,8 +148,21 @@ export function HeroOverlay() {
 
           <button
             type="button"
+            onClick={() => setActiveDrawer("reviews")}
+            className="flex min-h-[44px] items-center justify-center gap-1.5 rounded-full px-3 py-2 text-[13px] font-medium text-[#FAF7F2] transition hover:bg-[#FAF7F2]/12"
+          >
+            <Star
+              className="h-4 w-4 fill-[#E5A970] text-[#E5A970]"
+              strokeWidth={1.5}
+              aria-hidden="true"
+            />
+            <span className="tabular-nums">5.0</span>
+          </button>
+
+          <button
+            type="button"
             onClick={() => setActiveDrawer("location")}
-            className="flex min-h-[44px] items-center justify-center gap-1.5 rounded-full px-3.5 py-2 text-[13px] font-medium text-[#FAF7F2] transition hover:bg-[#FAF7F2]/12 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E5A970] active:scale-[0.97]"
+            className="flex min-h-[44px] items-center justify-center gap-1.5 rounded-full px-3 py-2 text-[13px] font-medium text-[#FAF7F2] transition hover:bg-[#FAF7F2]/12"
           >
             <MapPin
               className="h-4 w-4 text-[#D8CEC2]"
@@ -123,7 +176,7 @@ export function HeroOverlay() {
             href={buildWhatsAppUrl("general")}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex min-h-[44px] items-center justify-center gap-1.5 rounded-full px-3.5 py-2 text-[13px] font-medium text-[#FAF7F2] transition hover:bg-[#1B5E3A] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E5A970] active:scale-[0.97]"
+            className="flex min-h-[44px] items-center justify-center gap-1.5 rounded-full px-3 py-2 text-[13px] font-medium text-[#FAF7F2] transition hover:bg-[#1B5E3A]"
           >
             <MessageCircle
               className="h-4 w-4 text-[#6EE7A8]"
@@ -139,11 +192,10 @@ export function HeroOverlay() {
           aria-hidden="true"
         />
 
-        {/* High-Contrast Primary CTA */}
         <button
           type="button"
           onClick={enterExplore}
-          className="flex min-h-[48px] w-full items-center justify-center gap-2 rounded-full bg-[#FAF7F2] px-6 py-2.5 text-sm font-semibold text-[#14110F] transition hover:bg-[#F2ECE1] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E5A970] active:scale-[0.97] sm:min-h-[44px] sm:w-auto"
+          className="flex min-h-[48px] w-full items-center justify-center gap-2 rounded-full bg-[#FAF7F2] px-6 py-2.5 text-sm font-semibold text-[#14110F] transition hover:bg-[#F2ECE1] active:scale-[0.97] sm:min-h-[44px] sm:w-auto"
         >
           <span>Explore Space</span>
           <ArrowUpRight className="h-4 w-4" strokeWidth={1.75} aria-hidden="true" />

@@ -2,7 +2,16 @@ export type Vector3Tuple = [number, number, number];
 
 export type ExplorationMode = "hero" | "explore" | "seat_focus" | "ar";
 
+export type RouteStage =
+  | "starlet_front"
+  | "lobby_right"
+  | "escalator_up"
+  | "corridor_2f"
+  | "cafe_main";
+
 export type SeatZoneId = "wfc" | "sofa" | "window";
+
+export type SeatedActivity = "wfc" | "hangout" | "solo";
 
 export type DoorTransitionState = "closed" | "opening" | "open" | "closing";
 
@@ -17,6 +26,7 @@ export type ActiveDrawer =
   | "none"
   | "menu"
   | "location"
+  | "reviews"
   | "seat_info"
   | "ar_guide";
 
@@ -62,7 +72,9 @@ export interface SeatZoneConfig {
   subtitle: string;
   tags: string[];
   capacity: string;
+  defaultActivity: SeatedActivity;
+  previewPhoto: string;
   cameraPosition: Vector3Tuple;
   lookAt: Vector3Tuple;
-  hotspotPosition: Vector3Tuple;
+  tableTopPosition: Vector3Tuple;
 }
