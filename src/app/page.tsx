@@ -9,7 +9,6 @@ import { HeroOverlay } from "@/components/hud/HeroOverlay";
 import { MobileControls } from "@/components/hud/MobileControls";
 import { MenuDrawer } from "@/components/hud/MenuDrawer";
 import { LocationSheet } from "@/components/hud/LocationSheet";
-import { ReviewsDrawer } from "@/components/hud/ReviewsDrawer";
 import { SeatInfoDrawer } from "@/components/hud/SeatInfoDrawer";
 import { ArGuideModal } from "@/components/hud/ArGuideModal";
 
@@ -59,7 +58,6 @@ export default function HomePage() {
       <MobileControls />
       <MenuDrawer />
       <LocationSheet />
-      <ReviewsDrawer />
       <SeatInfoDrawer />
       <ArGuideModal />
     </main>

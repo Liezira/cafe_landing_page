@@ -2,24 +2,18 @@
 
 import { useState, useEffect } from "react";
 import type { ThreeEvent } from "@react-three/fiber";
-import { Html, Sparkles } from "@react-three/drei";
+import { Html } from "@react-three/drei";
 import { LIGHTING_PRESETS } from "@/lib/config/lightingPresets";
 import { SEAT_ZONES } from "@/lib/config/seatZones";
 import { useCafeStore } from "@/store/useCafeStore";
 import { InteractiveDoor } from "@/components/scene/InteractiveDoor";
 import { BaristaActor } from "@/components/scene/BaristaActor";
-import { SeatedActivityProps } from "@/components/scene/SeatedActivityProps";
 import type { SeatZoneId } from "@/lib/types/scene";
 
 /**
- * Architectural 3D representation modeled after the real SMALL GAPS Coffee BSD
- * photos (Hotel Starlet BSD Lt. 2):
- * - Exposed dark industrial steel ceiling + iconic long linear LED tube over Main Bar
- * - Raw concrete back wall with illuminated wood bottle shelves
- * - Fluted concrete accent wall with warm recessed cove lighting
- * - Floor-to-ceiling black-framed glass partition separating indoor & 2F outdoor balcony
- * - Terracotta exposed-brick cushioned bench + warm teak wood plank decking
- * Matches Blender Mesh Naming Contract 1-to-1 for future .glb hot-swap.
+ * 1-to-1 Procedural Cafe matching Diara's Blender Mesh Naming Contract:
+ * Env_Shell, Door_Main_Pivot, Door_Main, Bar_Counter, Barista_Rig,
+ * Seat_WFC_01, Seat_Sofa_01, Seat_Window_01, Lamp_Pendant_01..03.
  */
 export function ProceduralCafe() {
   const lightingMood = useCafeStore((s) => s.lightingMood);
@@ -29,7 +23,6 @@ export function ProceduralCafe() {
   const [hoveredTarget, setHoveredTarget] = useState<string | null>(null);
 
   const preset = LIGHTING_PRESETS[lightingMood];
-  const showDustMotes = lightingMood === "morning" || lightingMood === "sunset";
 
   useEffect(() => {
     document.body.style.cursor = hoveredTarget ? "pointer" : "auto";
@@ -50,158 +43,110 @@ export function ProceduralCafe() {
 
   return (
     <group name="Env_Shell">
-      {/* Subtle floating warm sunbeam dust particles in Morning & Sunset */}
-      {showDustMotes && (
-        <Sparkles
-          count={38}
-          scale={[8.5, 2.8, 7.5]}
-          position={[0, 1.5, 0.5]}
-          size={1.6}
-          speed={0.22}
-          opacity={0.2}
-          color={lightingMood === "sunset" ? "#FFD2A0" : "#FFF6E5"}
-        />
-      )}
-
-      {/* Teak Wood Plank Floor (Indoor + Outdoor Balcony Decking) */}
+      {/* Main Floor (Interior + Corridor Walkway) */}
       <mesh
         rotation={[-Math.PI / 2, 0, 0]}
         position={[0, 0, 1.2]}
         receiveShadow
       >
         <planeGeometry args={[11, 11.5]} />
-        <meshStandardMaterial color="#8F5E38" roughness={0.68} />
+        <meshStandardMaterial color="#D8CFC4" roughness={0.82} />
       </mesh>
 
-      {/* Polished Concrete Walkway Strip */}
+      {/* Warm Oak Interior Rug/Wood Accent */}
       <mesh
         rotation={[-Math.PI / 2, 0, 0]}
-        position={[-2.9, 0.004, 1.4]}
+        position={[0, 0.005, -0.3]}
         receiveShadow
       >
-        <planeGeometry args={[2.8, 7.8]} />
-        <meshStandardMaterial color="#A8A198" roughness={0.76} />
+        <planeGeometry args={[9.4, 6.8]} />
+        <meshStandardMaterial color="#C8A986" roughness={0.72} />
       </mesh>
 
-      {/* Dark Exposed Industrial Ceiling */}
+      {/* Ceiling */}
       <mesh position={[0, 3.25, -0.3]} receiveShadow>
-        <boxGeometry args={[9.8, 0.16, 7.2]} />
-        <meshStandardMaterial color="#181716" roughness={0.92} />
+        <boxGeometry args={[9.8, 0.15, 7.2]} />
+        <meshStandardMaterial color="#F2ECE1" roughness={0.9} />
       </mesh>
 
-      {/* Raw Concrete Back Wall behind Main Espresso Bar */}
+      {/* Back Wall */}
       <mesh position={[0, 1.6, -3.85]} receiveShadow castShadow>
         <boxGeometry args={[9.8, 3.25, 0.2]} />
-        <meshStandardMaterial color="#8C8984" roughness={0.86} />
+        <meshStandardMaterial color="#EFE8DC" roughness={0.88} />
       </mesh>
 
-      {/* Back Bar Illuminated Wood Shelves (signature SMALL GAPS display) */}
-      {[1.55, 2.02].map((yPos, i) => (
-        <group key={yPos} position={[-2.1, yPos, -3.65]}>
-          <mesh castShadow>
-            <boxGeometry args={[3.4, 0.06, 0.26]} />
-            <meshStandardMaterial color="#9A5B32" roughness={0.6} />
-          </mesh>
-          {/* Warm under-shelf LED glow */}
-          <mesh position={[0, -0.04, 0.02]}>
-            <boxGeometry args={[3.3, 0.02, 0.04]} />
-            <meshStandardMaterial
-              color="#FFF0D4"
-              emissive="#FFCB80"
-              emissiveIntensity={Math.max(0.6, preset.lampEmissiveIntensity * 0.85)}
-            />
-          </mesh>
-          {/* Displayed Elixir/Syrup Bottles */}
-          {[-1.2, -0.6, 0, 0.6, 1.2].map((bx) => (
-            <mesh key={`${i}-${bx}`} position={[bx, 0.14, 0]} castShadow>
-              <cylinderGeometry args={[0.032, 0.036, 0.22, 10]} />
-              <meshPhysicalMaterial
-                color={bx % 2 === 0 ? "#3A2518" : "#6D3B1E"}
-                roughness={0.18}
-                clearcoat={0.8}
-              />
-            </mesh>
-          ))}
-        </group>
-      ))}
-
-      {/* Left Industrial Charcoal Wall */}
+      {/* Left Wall */}
       <mesh position={[-4.8, 1.6, -0.3]} receiveShadow castShadow>
         <boxGeometry args={[0.2, 3.25, 7.1]} />
-        <meshStandardMaterial color="#23211F" roughness={0.88} />
+        <meshStandardMaterial color="#E6DDD0" roughness={0.86} />
       </mesh>
 
-      {/* Right Fluted Concrete Feature Wall + Warm Recessed Uplight Strip */}
-      <group position={[4.8, 1.6, -0.3]}>
-        <mesh receiveShadow castShadow>
-          <boxGeometry args={[0.2, 3.25, 7.1]} />
-          <meshStandardMaterial color="#595550" roughness={0.84} />
+      {/* Right Wall with Window Frame */}
+      <mesh position={[4.8, 1.6, -0.3]} receiveShadow castShadow>
+        <boxGeometry args={[0.2, 3.25, 7.1]} />
+        <meshStandardMaterial color="#E6DDD0" roughness={0.86} />
+      </mesh>
+
+      {/* Front Glass Facade - Left Partition */}
+      <group position={[-2.85, 1.6, 3.25]}>
+        <mesh castShadow receiveShadow>
+          <boxGeometry args={[3.9, 0.22, 0.16]} />
+          <meshStandardMaterial color="#2B241F" roughness={0.6} />
         </mesh>
-        <mesh position={[-0.12, -0.55, 0]}>
-          <boxGeometry args={[0.04, 0.05, 6.6]} />
-          <meshStandardMaterial
-            color="#FFE6B8"
-            emissive="#FFBF69"
-            emissiveIntensity={Math.max(0.7, preset.lampEmissiveIntensity)}
+        <mesh position={[0, -1.49, 0]} castShadow receiveShadow>
+          <boxGeometry args={[3.9, 0.24, 0.16]} />
+          <meshStandardMaterial color="#8B5A34" roughness={0.68} />
+        </mesh>
+        <mesh position={[0, 0, 0]}>
+          <boxGeometry args={[3.75, 2.75, 0.05]} />
+          <meshPhysicalMaterial
+            color="#E8F1F5"
+            transparent
+            opacity={0.26}
+            roughness={0.08}
           />
         </mesh>
       </group>
 
-      {/* Floor-to-Ceiling Black-Framed Glass Partition (Left & Right of Door) */}
-      {[-2.85, 2.85].map((xPos) => (
-        <group key={xPos} position={[xPos, 1.6, 3.25]}>
-          <mesh castShadow receiveShadow>
-            <boxGeometry args={[3.9, 0.18, 0.14]} />
-            <meshStandardMaterial color="#161514" roughness={0.55} />
-          </mesh>
-          <mesh position={[0, -1.49, 0]} castShadow receiveShadow>
-            <boxGeometry args={[3.9, 0.24, 0.16]} />
-            <meshStandardMaterial color="#161514" roughness={0.62} />
-          </mesh>
-          <mesh>
-            <boxGeometry args={[3.78, 2.76, 0.045]} />
-            <meshPhysicalMaterial
-              color="#DCE6EC"
-              transparent
-              opacity={0.24}
-              roughness={0.06}
-              clearcoat={1}
-              reflectivity={0.65}
-            />
-          </mesh>
-        </group>
-      ))}
+      {/* Front Glass Facade - Right Partition */}
+      <group position={[2.85, 1.6, 3.25]}>
+        <mesh castShadow receiveShadow>
+          <boxGeometry args={[3.9, 0.22, 0.16]} />
+          <meshStandardMaterial color="#2B241F" roughness={0.6} />
+        </mesh>
+        <mesh position={[0, -1.49, 0]} castShadow receiveShadow>
+          <boxGeometry args={[3.9, 0.24, 0.16]} />
+          <meshStandardMaterial color="#8B5A34" roughness={0.68} />
+        </mesh>
+        <mesh position={[0, 0, 0]}>
+          <boxGeometry args={[3.75, 2.75, 0.05]} />
+          <meshPhysicalMaterial
+            color="#E8F1F5"
+            transparent
+            opacity={0.26}
+            roughness={0.08}
+          />
+        </mesh>
+      </group>
 
-      {/* Front Header Beam & Illuminated SMALL GAPS Signage */}
-      <mesh position={[0, 2.82, 3.25]} castShadow receiveShadow>
-        <boxGeometry args={[9.8, 0.86, 0.22]} />
-        <meshStandardMaterial color="#171615" roughness={0.78} />
+      {/* Front Header Beam & Signage */}
+      <mesh position={[0, 2.8, 3.25]} castShadow receiveShadow>
+        <boxGeometry args={[9.8, 0.9, 0.22]} />
+        <meshStandardMaterial color="#26201C" roughness={0.75} />
       </mesh>
-      <mesh position={[0, 2.8, 3.38]}>
-        <boxGeometry args={[3.1, 0.36, 0.04]} />
+      <mesh position={[0, 2.78, 3.38]}>
+        <boxGeometry args={[3.2, 0.42, 0.04]} />
         <meshStandardMaterial
           color="#FAF7F2"
           emissive="#FFF1D6"
-          emissiveIntensity={Math.max(0.45, preset.lampEmissiveIntensity * 0.45)}
+          emissiveIntensity={preset.lampEmissiveIntensity * 0.35}
         />
       </mesh>
 
       {/* Clickable Hinged Main Glass Door */}
       <InteractiveDoor />
 
-      {/* Iconic Long Suspended Linear LED Tube Bar Light over Espresso Bar */}
-      <group name="Lamp_Pendant_01" position={[-2.15, 2.48, -0.35]}>
-        <mesh>
-          <boxGeometry args={[3.8, 0.045, 0.055]} />
-          <meshStandardMaterial
-            color="#FFFDF8"
-            emissive={preset.lampEmissiveColor}
-            emissiveIntensity={Math.max(0.95, preset.lampEmissiveIntensity * 1.1)}
-          />
-        </mesh>
-      </group>
-
-      {/* Main Espresso Bar Counter (Slatted Warm Wood Front + Black Stone Top) */}
+      {/* Espresso Bar Counter */}
       <group
         name="Bar_Counter"
         position={[-2.15, 0, -0.15]}
@@ -213,35 +158,34 @@ export function ProceduralCafe() {
         onPointerOut={() => setHoveredTarget(null)}
       >
         <mesh position={[0, 0.52, 0]} castShadow receiveShadow>
-          <boxGeometry args={[3.1, 1.04, 1.12]} />
+          <boxGeometry args={[2.9, 1.04, 1.15]} />
           <meshStandardMaterial
-            color={hoveredTarget === "bar" ? "#8E5835" : "#6D4124"}
-            roughness={0.64}
+            color={hoveredTarget === "bar" ? "#9C663F" : "#7D4F2E"}
+            roughness={0.62}
           />
         </mesh>
-        {/* Matte Black Countertop */}
+        {/* Countertop Stone */}
         <mesh position={[0, 1.06, 0]} castShadow receiveShadow>
-          <boxGeometry args={[3.2, 0.065, 1.24]} />
-          <meshStandardMaterial color="#1E1C1B" roughness={0.38} />
+          <boxGeometry args={[3.0, 0.07, 1.24]} />
+          <meshStandardMaterial color="#EAE2D6" roughness={0.45} />
         </mesh>
-        {/* Commercial Dual-Group Espresso Machine */}
-        <mesh position={[-0.82, 1.32, -0.1]} castShadow>
-          <boxGeometry args={[0.78, 0.46, 0.5]} />
+        {/* Espresso Machine */}
+        <mesh position={[-0.75, 1.32, -0.12]} castShadow>
+          <boxGeometry args={[0.72, 0.46, 0.48]} />
           <meshStandardMaterial
-            color="#262423"
-            metalness={0.78}
-            roughness={0.24}
+            color="#2E2A28"
+            metalness={0.65}
+            roughness={0.3}
           />
         </mesh>
-        {/* Angled Illuminated Bottle Showcase */}
-        <mesh position={[0.72, 1.28, 0.06]} castShadow>
-          <boxGeometry args={[0.88, 0.42, 0.44]} />
+        {/* Pastry Display Case */}
+        <mesh position={[0.85, 1.26, 0.08]} castShadow>
+          <boxGeometry args={[0.76, 0.34, 0.46]} />
           <meshPhysicalMaterial
-            color="#FFF8EC"
+            color="#FFFFFF"
             transparent
-            opacity={0.32}
-            roughness={0.08}
-            clearcoat={1}
+            opacity={0.38}
+            roughness={0.1}
           />
         </mesh>
         {explorationMode === "explore" && (
@@ -260,7 +204,30 @@ export function ProceduralCafe() {
       {/* Barista Character */}
       <BaristaActor />
 
-      {/* Seat Zone 1: Indoor WFC Teak Table */}
+      {/* Warm Pendant Lamps (emissive driven by 4-Mood Lighting) */}
+      {[-2.8, -2.15, -1.5].map((xPos, idx) => (
+        <group
+          key={xPos}
+          name={`Lamp_Pendant_0${idx + 1}`}
+          position={[xPos, 2.48, -0.1]}
+        >
+          <mesh position={[0, 0.38, 0]}>
+            <cylinderGeometry args={[0.012, 0.012, 0.75, 8]} />
+            <meshStandardMaterial color="#1F1A17" />
+          </mesh>
+          <mesh>
+            <sphereGeometry args={[0.14, 16, 16]} />
+            <meshStandardMaterial
+              color="#FFF6E5"
+              emissive={preset.lampEmissiveColor}
+              emissiveIntensity={preset.lampEmissiveIntensity}
+              roughness={0.25}
+            />
+          </mesh>
+        </group>
+      ))}
+
+      {/* Seat Zone 1: Indoor WFC Table */}
       <group
         name="Seat_WFC_01"
         position={[2.6, 0, -0.5]}
@@ -272,24 +239,29 @@ export function ProceduralCafe() {
         onPointerOut={() => setHoveredTarget(null)}
       >
         <mesh position={[0, 0.74, 0]} castShadow receiveShadow>
-          <boxGeometry args={[1.35, 0.065, 0.86]} />
+          <boxGeometry args={[1.35, 0.07, 0.85]} />
           <meshStandardMaterial
-            color={hoveredTarget === "wfc" ? "#AD7546" : "#8E5E35"}
-            roughness={0.56}
+            color={hoveredTarget === "wfc" ? "#B57B4C" : "#9A673F"}
+            roughness={0.6}
           />
         </mesh>
         <mesh position={[0, 0.36, 0]} castShadow>
           <boxGeometry args={[0.12, 0.72, 0.55]} />
-          <meshStandardMaterial color="#1D1A18" roughness={0.68} />
+          <meshStandardMaterial color="#2B241F" roughness={0.7} />
         </mesh>
+        {/* Two Minimalist Chairs */}
         {[-0.45, 0.45].map((zOff) => (
           <mesh key={zOff} position={[0, 0.42, zOff * 1.4]} castShadow>
-            <boxGeometry args={[0.46, 0.44, 0.46]} />
-            <meshStandardMaterial color="#252220" roughness={0.78} />
+            <boxGeometry args={[0.45, 0.44, 0.45]} />
+            <meshStandardMaterial color="#574D45" roughness={0.8} />
           </mesh>
         ))}
         {explorationMode === "explore" && (
-          <Html position={[0, 1.32, 0]} center distanceFactor={9}>
+          <Html
+            position={[0, 1.32, 0]}
+            center
+            distanceFactor={9}
+          >
             <button
               type="button"
               onClick={() => focusSeat("wfc")}
@@ -301,7 +273,7 @@ export function ProceduralCafe() {
         )}
       </group>
 
-      {/* Seat Zone 2: Fluted-Wall Lounge Banquette */}
+      {/* Seat Zone 2: Lounge & Group Sofa Corner */}
       <group
         name="Seat_Sofa_01"
         position={[-2.6, 0, -2.35]}
@@ -315,17 +287,17 @@ export function ProceduralCafe() {
         <mesh position={[0, 0.38, -0.35]} castShadow receiveShadow>
           <boxGeometry args={[1.95, 0.46, 0.78]} />
           <meshStandardMaterial
-            color={hoveredTarget === "sofa" ? "#4F463F" : "#342E29"}
-            roughness={0.88}
+            color={hoveredTarget === "sofa" ? "#8E6C54" : "#6D5442"}
+            roughness={0.9}
           />
         </mesh>
         <mesh position={[0, 0.72, -0.68]} castShadow>
           <boxGeometry args={[1.95, 0.42, 0.18]} />
-          <meshStandardMaterial color="#28231F" roughness={0.9} />
+          <meshStandardMaterial color="#5E4738" roughness={0.9} />
         </mesh>
         <mesh position={[0, 0.44, 0.48]} castShadow receiveShadow>
           <boxGeometry args={[1.2, 0.06, 0.6]} />
-          <meshStandardMaterial color="#8E5E35" roughness={0.58} />
+          <meshStandardMaterial color="#9A673F" roughness={0.6} />
         </mesh>
         {explorationMode === "explore" && (
           <Html position={[0, 1.3, 0]} center distanceFactor={9}>
@@ -340,7 +312,7 @@ export function ProceduralCafe() {
         )}
       </group>
 
-      {/* Seat Zone 3: Outdoor Terracotta Brick Bench Terrace */}
+      {/* Seat Zone 3: Window Counter Seat */}
       <group
         name="Seat_Window_01"
         position={[4.1, 0, 2.0]}
@@ -351,33 +323,19 @@ export function ProceduralCafe() {
         }}
         onPointerOut={() => setHoveredTarget(null)}
       >
-        {/* Terracotta Exposed Brick Bench Base */}
-        <mesh position={[0.15, 0.24, 0]} castShadow receiveShadow>
-          <boxGeometry args={[0.72, 0.48, 2.1]} />
+        <mesh position={[0.25, 0.92, 0]} castShadow receiveShadow>
+          <boxGeometry args={[0.58, 0.07, 1.9]} />
           <meshStandardMaterial
-            color={hoveredTarget === "window" ? "#B86B46" : "#9E5738"}
-            roughness={0.86}
+            color={hoveredTarget === "window" ? "#B57B4C" : "#9A673F"}
+            roughness={0.58}
           />
         </mesh>
-        {/* Grey & Brown Cushions */}
-        {[-0.55, 0.55].map((zOff, idx) => (
-          <mesh key={zOff} position={[0.15, 0.51, zOff]} castShadow>
-            <boxGeometry args={[0.52, 0.07, 0.52]} />
-            <meshStandardMaterial
-              color={idx === 0 ? "#6C6A67" : "#5A4637"}
-              roughness={0.92}
-            />
+        {[-0.45, 0.45].map((zOff) => (
+          <mesh key={zOff} position={[-0.25, 0.62, zOff]} castShadow>
+            <cylinderGeometry args={[0.18, 0.18, 0.06, 16]} />
+            <meshStandardMaterial color="#4A3D34" roughness={0.75} />
           </mesh>
         ))}
-        {/* Square Teak Side Table */}
-        <mesh position={[-0.36, 0.72, 0]} castShadow receiveShadow>
-          <boxGeometry args={[0.45, 0.05, 0.45]} />
-          <meshStandardMaterial color="#8E5E35" roughness={0.58} />
-        </mesh>
-        <mesh position={[-0.36, 0.36, 0]} castShadow>
-          <boxGeometry args={[0.06, 0.72, 0.06]} />
-          <meshStandardMaterial color="#181716" roughness={0.7} />
-        </mesh>
         {explorationMode === "explore" && (
           <Html position={[0, 1.48, 0]} center distanceFactor={9}>
             <button
@@ -391,10 +349,7 @@ export function ProceduralCafe() {
         )}
       </group>
 
-      {/* Dynamic Tabletop Props for WFC / Hangout / Solo Seated Mode */}
-      <SeatedActivityProps />
-
-      {/* Decorative Potted Greenery */}
+      {/* Decorative Potted Indoor Plants */}
       {[
         [-4.2, 0, 2.6],
         [4.2, 0, -3.2],
@@ -404,11 +359,11 @@ export function ProceduralCafe() {
         <group key={idx} position={[x, y, z]}>
           <mesh position={[0, 0.24, 0]} castShadow>
             <cylinderGeometry args={[0.22, 0.16, 0.48, 12]} />
-            <meshStandardMaterial color="#2C2926" roughness={0.85} />
+            <meshStandardMaterial color="#C4B5A5" roughness={0.85} />
           </mesh>
           <mesh position={[0, 0.68, 0]} castShadow>
             <dodecahedronGeometry args={[0.34, 0]} />
-            <meshStandardMaterial color="#2F593D" roughness={0.82} />
+            <meshStandardMaterial color="#3D6B4C" roughness={0.82} />
           </mesh>
         </group>
       ))}
