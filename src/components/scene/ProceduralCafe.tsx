@@ -8,6 +8,7 @@ import { SEAT_ZONES } from "@/lib/config/seatZones";
 import { useCafeStore } from "@/store/useCafeStore";
 import { InteractiveDoor } from "@/components/scene/InteractiveDoor";
 import { BaristaActor } from "@/components/scene/BaristaActor";
+import { BarServedDrink } from "@/components/scene/BarServedDrink";
 import { SeatedActivityProps } from "@/components/scene/SeatedActivityProps";
 import type { SeatZoneId } from "@/lib/types/scene";
 
@@ -259,6 +260,7 @@ export function ProceduralCafe() {
 
       {/* Barista Character */}
       <BaristaActor />
+      <BarServedDrink />
 
       {/* Seat Zone 1: Indoor WFC Teak Table */}
       <group

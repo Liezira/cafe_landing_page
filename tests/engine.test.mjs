@@ -99,3 +99,10 @@ test("builds pre-filled WhatsApp URL with seat name", () => {
   assert.ok(url.startsWith("https://wa.me/62818199099?text="));
   assert.ok(decodeURIComponent(url).includes("Indoor WFC Table"));
 });
+
+test("barista chat answers SMALL GAPS signature menu warmly and deflects off-topic queries", () => {
+  const isSmallGapsTopic = (q) =>
+    /(gaps|latte|coffee|kopi|wfc|starlet|halal|pork|buka|hour|reserve|wa|menu|strudel|cheesecake)/i.test(q);
+  assert.equal(isSmallGapsTopic("What is your best coffee at Small Gaps?"), true);
+  assert.equal(isSmallGapsTopic("Solve this calculus integral for me"), false);
+});

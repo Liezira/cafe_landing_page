@@ -8,6 +8,7 @@ import {
   CAFE_OBSTACLES,
   HERO_CAMERA_LOOKAT,
   HERO_CAMERA_POS,
+  PLAYER_EYE_HEIGHT,
   PLAYER_RADIUS,
   PLAYER_WALK_SPEED,
   ROOM_BOUNDS,
@@ -28,6 +29,7 @@ import { useCafeStore } from "@/store/useCafeStore";
 export function CameraRig() {
   const { camera } = useThree();
   const explorationMode = useCafeStore((s) => s.explorationMode);
+  const cameraPerspective = useCafeStore((s) => s.cameraPerspective);
   const activeSeat = useCafeStore((s) => s.activeSeat);
   const teleportNonce = useCafeStore((s) => s.teleportNonce);
   const teleportTarget = useCafeStore((s) => s.teleportTarget);
@@ -36,35 +38,47 @@ export function CameraRig() {
   const avatarPosRef = useRef(new THREE.Vector3(...STARLET_SPAWN_POS));
   const isMovingRef = useRef(false);
 
-  const cameraOrbitYawRef = useRef(0);
+  const cameraYawRef = useRef(0);
+  const fppPitchRef = useRef(-0.04);
   const seatYawOffsetRef = useRef(0);
   const seatPitchOffsetRef = useRef(0);
+  const walkPhaseRef = useRef(0);
 
   const keysRef = useRef<Record<string, boolean>>({});
   const forwardVec = useRef(new THREE.Vector3());
   const rightVec = useRef(new THREE.Vector3());
   const desiredCamPos = useRef(new THREE.Vector3());
   const lookTarget = useRef(new THREE.Vector3());
+  const fppEuler = useRef(new THREE.Euler(0, 0, 0, "YXZ"));
 
-  // Sync avatar position whenever Skip-to-Cafe or Start-from-Hotel teleport is triggered
   useEffect(() => {
     avatarPosRef.current.set(...teleportTarget);
     if (avatarRef.current) {
       avatarRef.current.position.set(...teleportTarget);
     }
-    cameraOrbitYawRef.current = 0;
+    cameraYawRef.current = 0;
+    fppPitchRef.current = -0.04;
   }, [teleportNonce, teleportTarget]);
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         const state = useCafeStore.getState();
-        if (state.activeDrawer !== "none") {
+        if (state.showBaristaDialogue) {
+          state.dismissBaristaDialogue();
+        } else if (state.activeDrawer !== "none") {
           state.setActiveDrawer("none");
         } else if (state.explorationMode === "seat_focus") {
           state.clearSeatFocus();
         } else if (state.explorationMode === "explore") {
           state.exitToHero();
+        }
+        return;
+      }
+      if (e.code === "KeyV") {
+        const state = useCafeStore.getState();
+        if (state.explorationMode === "explore") {
+          state.toggleCameraPerspective();
         }
         return;
       }
@@ -85,7 +99,6 @@ export function CameraRig() {
 
   useEffect(() => {
     if (explorationMode === "hero") {
-      // Hero view showcases SMALL GAPS Coffee 2F Front Facade directly
       gsap.to(camera.position, {
         x: HERO_CAMERA_POS[0],
         y: SECOND_FLOOR_Y + HERO_CAMERA_POS[1],
@@ -113,7 +126,6 @@ export function CameraRig() {
     const delta = Math.min(rawDelta, 0.05);
     const state = useCafeStore.getState();
 
-    // 1. Hero Breathing Front Facade (2F)
     if (state.explorationMode === "hero") {
       isMovingRef.current = false;
       const t = clock.getElapsedTime();
@@ -130,7 +142,6 @@ export function CameraRig() {
       return;
     }
 
-    // 2. Seated First-Person Eye-Level POV (WFC / Hangout / Solo)
     if (state.explorationMode === "seat_focus" && state.activeSeat) {
       isMovingRef.current = false;
       const seat = SEAT_ZONES[state.activeSeat];
@@ -160,10 +171,16 @@ export function CameraRig() {
 
     if (state.explorationMode !== "explore") return;
 
-    // 3. Harvest Moon 3rd-Person Cozy Follow-Cam + Avatar Movement
     const look = state.consumeLookDelta();
-    if (look.dx !== 0) {
-      cameraOrbitYawRef.current -= look.dx * 0.005;
+    if (look.dx !== 0 || look.dy !== 0) {
+      cameraYawRef.current -= look.dx * 0.0048;
+      if (state.cameraPerspective === "fpp") {
+        fppPitchRef.current = THREE.MathUtils.clamp(
+          fppPitchRef.current - look.dy * 0.0038,
+          -0.38,
+          0.45
+        );
+      }
     }
 
     if (!state.isRidingEscalator) {
@@ -186,13 +203,21 @@ export function CameraRig() {
 
         forwardVec.current
           .set(0, 0, -1)
-          .applyAxisAngle(THREE.Object3D.DEFAULT_UP, cameraOrbitYawRef.current);
+          .applyAxisAngle(THREE.Object3D.DEFAULT_UP, cameraYawRef.current);
         rightVec.current
           .set(1, 0, 0)
-          .applyAxisAngle(THREE.Object3D.DEFAULT_UP, cameraOrbitYawRef.current);
+          .applyAxisAngle(THREE.Object3D.DEFAULT_UP, cameraYawRef.current);
 
-        const dx = (forwardVec.current.x * normY + rightVec.current.x * normX) * PLAYER_WALK_SPEED * 1.15 * delta;
-        const dz = (forwardVec.current.z * normY + rightVec.current.z * normX) * PLAYER_WALK_SPEED * 1.15 * delta;
+        const dx =
+          (forwardVec.current.x * normY + rightVec.current.x * normX) *
+          PLAYER_WALK_SPEED *
+          1.15 *
+          delta;
+        const dz =
+          (forwardVec.current.z * normY + rightVec.current.z * normX) *
+          PLAYER_WALK_SPEED *
+          1.15 *
+          delta;
 
         const proposedX = avatarPosRef.current.x + dx;
         const proposedZ = avatarPosRef.current.z + dz;
@@ -201,7 +226,6 @@ export function CameraRig() {
         let resolvedZ = proposedZ;
 
         if (state.onSecondFloor) {
-          // If inside cafe zone, apply full cafe AABB collision clamping
           if (proposedZ <= 5.6 && Math.abs(proposedX) <= 4.7) {
             const clamped = clampPlayerPosition(
               { x: avatarPosRef.current.x, z: avatarPosRef.current.z },
@@ -214,17 +238,14 @@ export function CameraRig() {
             resolvedX = clamped.x;
             resolvedZ = clamped.z;
           } else {
-            // Keep player within 2F landing & corridor bounds
             resolvedX = THREE.MathUtils.clamp(proposedX, -2.0, 8.6);
             resolvedZ = THREE.MathUtils.clamp(proposedZ, 4.0, 8.6);
           }
         } else {
-          // Keep player within Ground Floor Hotel Starlet front + right lobby bounds
           resolvedX = THREE.MathUtils.clamp(proposedX, -4.2, 8.6);
           resolvedZ = THREE.MathUtils.clamp(proposedZ, 12.2, 19.6);
         }
 
-        // Rotate avatar smoothly toward walking direction
         if (avatarRef.current) {
           const targetAngle = Math.atan2(dx, dz);
           avatarRef.current.rotation.y = THREE.MathUtils.lerp(
@@ -233,6 +254,8 @@ export function CameraRig() {
             0.22
           );
         }
+
+        walkPhaseRef.current += delta * 9.5;
 
         const { y, stage } = resolveStageAndElevation(
           resolvedX,
@@ -246,7 +269,6 @@ export function CameraRig() {
           state.setContextHint(ROUTE_STAGE_LABELS[stage].hint);
         }
 
-        // Trigger smooth automatic ride up the Twin Escalators to 2F!
         if (
           !state.onSecondFloor &&
           resolvedX >= ESCALATOR_TRIGGER_BOX.minX &&
@@ -281,25 +303,39 @@ export function CameraRig() {
       avatarRef.current.position.copy(avatarPosRef.current);
     }
 
-    // Harvest Moon cozy overhead-angled 3rd-person follow camera
-    const camDist = 4.6;
-    const camHeight = 3.85;
-    desiredCamPos.current.set(
-      avatarPosRef.current.x + Math.sin(cameraOrbitYawRef.current) * camDist,
-      avatarPosRef.current.y + camHeight,
-      avatarPosRef.current.z + Math.cos(cameraOrbitYawRef.current) * camDist
-    );
-    camera.position.lerp(desiredCamPos.current, 0.12);
+    // Dual-Mode Perspective: FPP (Eye-Level Immersive) vs TPP (Harvest Moon / Citampi Cozy Follow-Cam)
+    if (state.cameraPerspective === "fpp") {
+      const headBob = isMovingRef.current
+        ? Math.sin(walkPhaseRef.current) * 0.022
+        : 0;
+      desiredCamPos.current.set(
+        avatarPosRef.current.x,
+        avatarPosRef.current.y + PLAYER_EYE_HEIGHT + headBob,
+        avatarPosRef.current.z
+      );
+      camera.position.lerp(desiredCamPos.current, 0.25);
+      fppEuler.current.set(fppPitchRef.current, cameraYawRef.current, 0, "YXZ");
+      camera.quaternion.setFromEuler(fppEuler.current);
+    } else {
+      const camDist = 4.6;
+      const camHeight = 3.85;
+      desiredCamPos.current.set(
+        avatarPosRef.current.x + Math.sin(cameraYawRef.current) * camDist,
+        avatarPosRef.current.y + camHeight,
+        avatarPosRef.current.z + Math.cos(cameraYawRef.current) * camDist
+      );
+      camera.position.lerp(desiredCamPos.current, 0.12);
 
-    lookTarget.current.set(
-      avatarPosRef.current.x,
-      avatarPosRef.current.y + 1.05,
-      avatarPosRef.current.z
-    );
-    camera.lookAt(lookTarget.current);
+      lookTarget.current.set(
+        avatarPosRef.current.x,
+        avatarPosRef.current.y + 1.05,
+        avatarPosRef.current.z
+      );
+      camera.lookAt(lookTarget.current);
+    }
   });
 
-  if (explorationMode !== "explore") {
+  if (explorationMode !== "explore" || cameraPerspective === "fpp") {
     return null;
   }
 

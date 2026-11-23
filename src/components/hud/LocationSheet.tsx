@@ -1,15 +1,27 @@
 "use client";
 
-import { Clock, MapPin, MessageCircle, Navigation, Star, X } from "lucide-react";
+import {
+  Clock,
+  MapPin,
+  MessageCircle,
+  Navigation,
+  Sparkles,
+  Star,
+  X,
+} from "lucide-react";
+import { UI_COPY } from "@/lib/config/i18n";
 import { CAFE_INFO } from "@/lib/config/menuData";
 import { buildWhatsAppUrl } from "@/lib/engine/whatsappLink";
 import { useCafeStore } from "@/store/useCafeStore";
 
 export function LocationSheet() {
   const activeDrawer = useCafeStore((s) => s.activeDrawer);
+  const language = useCafeStore((s) => s.language);
   const setActiveDrawer = useCafeStore((s) => s.setActiveDrawer);
 
   if (activeDrawer !== "location") return null;
+
+  const t = UI_COPY[language];
 
   return (
     <div
@@ -68,6 +80,18 @@ export function LocationSheet() {
           <p className="text-xs font-medium text-[#8A4A1F]">
             {CAFE_INFO.halalNote}
           </p>
+        </div>
+
+        {/* Subtle Gading Serpong Dec 2026 Expansion Note */}
+        <div className="mt-4 flex items-start gap-2.5 rounded-[14px] border border-[#EAE2D6] bg-[#F2ECE1] p-3.5 text-xs text-[#574D45]">
+          <Sparkles
+            className="mt-0.5 h-4 w-4 shrink-0 text-[#8A4A1F]"
+            strokeWidth={1.5}
+          />
+          <div>
+            <p className="font-semibold text-[#14110F]">{t.newStoreTitle}</p>
+            <p className="mt-0.5">{t.newStoreDesc}</p>
+          </div>
         </div>
 
         <div className="mt-5 flex flex-col gap-2.5 sm:flex-row">

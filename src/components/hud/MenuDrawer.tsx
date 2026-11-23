@@ -1,6 +1,6 @@
 "use client";
 
-import { MessageCircle, X } from "lucide-react";
+import { Coffee, MessageCircle, X } from "lucide-react";
 import { CAFE_INFO, CURATED_MENU } from "@/lib/config/menuData";
 import { buildWhatsAppUrl } from "@/lib/engine/whatsappLink";
 import { useCafeStore } from "@/store/useCafeStore";
@@ -14,6 +14,7 @@ const CATEGORIES = [
 export function MenuDrawer() {
   const activeDrawer = useCafeStore((s) => s.activeDrawer);
   const setActiveDrawer = useCafeStore((s) => s.setActiveDrawer);
+  const orderMenuItemPreview = useCafeStore((s) => s.orderMenuItemPreview);
 
   if (activeDrawer !== "menu") return null;
 
@@ -29,19 +30,17 @@ export function MenuDrawer() {
         onClick={(e) => e.stopPropagation()}
         className="flex max-h-[82dvh] w-full flex-col rounded-t-[24px] bg-[#FAF7F2] text-[#14110F] shadow-2xl sm:h-dvh sm:max-h-none sm:w-[420px] sm:rounded-none"
       >
-        {/* Mobile drag handle */}
         <div className="flex justify-center pt-3 sm:hidden">
           <span className="h-1 w-9 rounded-full bg-[#D8CEC2]" />
         </div>
 
-        {/* Header */}
         <div className="flex items-start justify-between border-b border-[#EAE2D6] px-6 py-5">
           <div>
             <h2 className="font-serif text-2xl font-medium tracking-[-0.015em] text-[#14110F]">
               Daily Comfort Menu
             </h2>
             <p className="mt-1 text-xs font-medium text-[#574D45]">
-              {CAFE_INFO.halalNote}
+              {CAFE_INFO.halalNote} · Tap any item to watch our barista prepare it
             </p>
           </div>
           <button
@@ -54,7 +53,6 @@ export function MenuDrawer() {
           </button>
         </div>
 
-        {/* Scrollable Menu List */}
         <div className="flex-1 space-y-6 overflow-y-auto px-6 py-5">
           {CATEGORIES.map((category) => {
             const items = CURATED_MENU.filter((m) => m.category === category);
@@ -79,6 +77,14 @@ export function MenuDrawer() {
                       <p className="mt-1 text-sm leading-relaxed text-[#574D45]">
                         {item.description}
                       </p>
+                      <button
+                        type="button"
+                        onClick={() => orderMenuItemPreview(item.id)}
+                        className="mt-2.5 inline-flex min-h-[34px] items-center gap-1.5 rounded-full border border-[#8A4A1F]/35 bg-[#F2ECE1] px-3 py-1 text-xs font-semibold text-[#8A4A1F] transition hover:bg-[#8A4A1F] hover:text-[#FAF7F2]"
+                      >
+                        <Coffee className="h-3.5 w-3.5" strokeWidth={1.6} />
+                        <span>Order Preview at Bar</span>
+                      </button>
                     </li>
                   ))}
                 </ul>
@@ -87,7 +93,6 @@ export function MenuDrawer() {
           })}
         </div>
 
-        {/* Sticky Conversion Footer */}
         <div className="border-t border-[#EAE2D6] bg-[#FAF7F2] px-6 py-4 pb-[max(16px,env(safe-area-inset-bottom))]">
           <a
             href={buildWhatsAppUrl("menu")}

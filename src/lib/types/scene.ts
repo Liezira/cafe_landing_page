@@ -2,6 +2,8 @@ export type Vector3Tuple = [number, number, number];
 
 export type ExplorationMode = "hero" | "explore" | "seat_focus" | "ar";
 
+export type CameraPerspective = "tpp" | "fpp";
+
 export type RouteStage =
   | "starlet_front"
   | "lobby_right"

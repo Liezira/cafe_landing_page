@@ -11,7 +11,9 @@ import { MenuDrawer } from "@/components/hud/MenuDrawer";
 import { LocationSheet } from "@/components/hud/LocationSheet";
 import { ReviewsDrawer } from "@/components/hud/ReviewsDrawer";
 import { SeatInfoDrawer } from "@/components/hud/SeatInfoDrawer";
+import { BaristaDialogueCard } from "@/components/hud/BaristaDialogueCard";
 import { ArGuideModal } from "@/components/hud/ArGuideModal";
+import { LiteCafeView } from "@/components/hud/LiteCafeView";
 
 const CafeCanvas = dynamic(
   () => import("@/components/scene/CafeCanvas").then((mod) => mod.CafeCanvas),
@@ -34,6 +36,7 @@ const CafeCanvas = dynamic(
 
 export default function HomePage() {
   const setArCapability = useCafeStore((s) => s.setArCapability);
+  const liteMode = useCafeStore((s) => s.liteMode);
 
   useEffect(() => {
     let mounted = true;
@@ -47,6 +50,10 @@ export default function HomePage() {
     };
   }, [setArCapability]);
 
+  if (liteMode) {
+    return <LiteCafeView />;
+  }
+
   return (
     <main className="relative min-h-dvh w-full overflow-hidden bg-[#14110F]">
       <CafeCanvas />
@@ -57,6 +64,7 @@ export default function HomePage() {
       </div>
 
       <MobileControls />
+      <BaristaDialogueCard />
       <MenuDrawer />
       <LocationSheet />
       <ReviewsDrawer />

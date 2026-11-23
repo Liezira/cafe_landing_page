@@ -1,15 +1,19 @@
 import { create } from "zustand";
 import { ASSET_CONFIG } from "@/lib/config/assetConfig";
+import type { UiLanguage } from "@/lib/config/i18n";
+import { CURATED_MENU, type MenuItem } from "@/lib/config/menuData";
 import {
   CAFE_TELEPORT_POS,
   STARLET_SPAWN_POS,
 } from "@/lib/config/routeWaypoints";
 import { SEAT_ZONES } from "@/lib/config/seatZones";
+import { cafeAmbienceAudio } from "@/lib/engine/cafeAudio";
 import type {
   ActiveDrawer,
   AnalogVector,
   ArCapability,
   BaristaState,
+  CameraPerspective,
   DoorTransitionState,
   ExplorationMode,
   LightingMood,
@@ -22,6 +26,11 @@ import type {
 
 export interface CafeStoreState {
   explorationMode: ExplorationMode;
+  cameraPerspective: CameraPerspective;
+  language: UiLanguage;
+  audioEnabled: boolean;
+  liteMode: boolean;
+
   routeStage: RouteStage;
   onSecondFloor: boolean;
   isRidingEscalator: boolean;
@@ -36,6 +45,8 @@ export interface CafeStoreState {
   activeSeat: SeatZoneId | null;
   seatedActivity: SeatedActivity;
   baristaState: BaristaState;
+  showBaristaDialogue: boolean;
+  orderedItem: MenuItem | null;
 
   lightingMood: LightingMood;
   activeDrawer: ActiveDrawer;
@@ -47,6 +58,13 @@ export interface CafeStoreState {
   startJourneyFromHotel: () => void;
   skipToCafe: () => void;
   exitToHero: () => void;
+
+  toggleLanguage: () => void;
+  toggleAudio: () => void;
+  toggleLiteMode: () => void;
+
+  setCameraPerspective: (perspective: CameraPerspective) => void;
+  toggleCameraPerspective: () => void;
 
   setRouteStage: (stage: RouteStage) => void;
   setOnSecondFloor: (val: boolean) => void;
@@ -65,6 +83,8 @@ export interface CafeStoreState {
 
   setBaristaState: (state: BaristaState) => void;
   interactWithBarCounter: () => void;
+  orderMenuItemPreview: (menuId: string) => void;
+  dismissBaristaDialogue: () => void;
 
   setLightingMood: (mood: LightingMood) => void;
   setActiveDrawer: (drawer: ActiveDrawer) => void;
@@ -76,6 +96,11 @@ export interface CafeStoreState {
 
 export const useCafeStore = create<CafeStoreState>((set, get) => ({
   explorationMode: "hero",
+  cameraPerspective: "tpp",
+  language: "en",
+  audioEnabled: false,
+  liteMode: false,
+
   routeStage: "starlet_front",
   onSecondFloor: false,
   isRidingEscalator: false,
@@ -90,6 +115,8 @@ export const useCafeStore = create<CafeStoreState>((set, get) => ({
   activeSeat: null,
   seatedActivity: "wfc",
   baristaState: "idle_brewing",
+  showBaristaDialogue: false,
+  orderedItem: null,
 
   lightingMood: "sunset",
   activeDrawer: "none",
@@ -105,9 +132,13 @@ export const useCafeStore = create<CafeStoreState>((set, get) => ({
       isRidingEscalator: false,
       activeDrawer: "none",
       activeSeat: null,
+      showBaristaDialogue: false,
       teleportNonce: s.teleportNonce + 1,
       teleportTarget: STARLET_SPAWN_POS,
-      contextHint: "Walk up the steps & turn right to the 2F escalators",
+      contextHint:
+        s.language === "id"
+          ? "Naik tangga pendek & belok kanan ke eskalator Lt. 2"
+          : "Walk up the steps & turn right to the 2F escalators",
     })),
 
   startJourneyFromHotel: () =>
@@ -118,9 +149,13 @@ export const useCafeStore = create<CafeStoreState>((set, get) => ({
       isRidingEscalator: false,
       activeDrawer: "none",
       activeSeat: null,
+      showBaristaDialogue: false,
       teleportNonce: s.teleportNonce + 1,
       teleportTarget: STARLET_SPAWN_POS,
-      contextHint: "Start at Hotel Starlet BSD · Walk up & turn right",
+      contextHint:
+        s.language === "id"
+          ? "Mulai dari Hotel Starlet BSD · Naik tangga & belok kanan"
+          : "Start at Hotel Starlet BSD · Walk up & turn right",
     })),
 
   skipToCafe: () =>
@@ -131,9 +166,13 @@ export const useCafeStore = create<CafeStoreState>((set, get) => ({
       isRidingEscalator: false,
       activeDrawer: "none",
       activeSeat: null,
+      showBaristaDialogue: false,
       teleportNonce: s.teleportNonce + 1,
       teleportTarget: CAFE_TELEPORT_POS,
-      contextHint: "Arrived at SMALL GAPS 2F · Tap glass door to enter",
+      contextHint:
+        s.language === "id"
+          ? "Tiba di SMALL GAPS Lt. 2 · Ketuk pintu kaca untuk masuk"
+          : "Arrived at SMALL GAPS 2F · Tap glass door to enter",
     })),
 
   exitToHero: () =>
@@ -141,9 +180,39 @@ export const useCafeStore = create<CafeStoreState>((set, get) => ({
       explorationMode: "hero",
       activeDrawer: "none",
       activeSeat: null,
+      showBaristaDialogue: false,
       analogVector: { x: 0, y: 0, active: false },
       contextHint: null,
     }),
+
+  toggleLanguage: () =>
+    set((s) => ({
+      language: s.language === "en" ? "id" : "en",
+    })),
+
+  toggleAudio: () => {
+    const next = !get().audioEnabled;
+    if (next) {
+      cafeAmbienceAudio.start();
+    } else {
+      cafeAmbienceAudio.stop();
+    }
+    set({ audioEnabled: next });
+  },
+
+  toggleLiteMode: () =>
+    set((s) => ({
+      liteMode: !s.liteMode,
+      activeDrawer: "none",
+      showBaristaDialogue: false,
+    })),
+
+  setCameraPerspective: (cameraPerspective) => set({ cameraPerspective }),
+
+  toggleCameraPerspective: () =>
+    set((s) => ({
+      cameraPerspective: s.cameraPerspective === "tpp" ? "fpp" : "tpp",
+    })),
 
   setRouteStage: (routeStage) => set({ routeStage }),
   setOnSecondFloor: (onSecondFloor) => set({ onSecondFloor }),
@@ -171,14 +240,18 @@ export const useCafeStore = create<CafeStoreState>((set, get) => ({
   },
 
   toggleDoor: () => {
-    const { isDoorOpen } = get();
+    const { isDoorOpen, language } = get();
     const nextOpen = !isDoorOpen;
     set({
       isDoorOpen: nextOpen,
       doorState: nextOpen ? "opening" : "closing",
       baristaState: nextOpen ? "greeting_wave" : "idle_brewing",
       contextHint: nextOpen
-        ? "Welcome inside · Click any table to sit or tap the bar"
+        ? language === "id"
+          ? "Selamat datang · Klik meja untuk duduk atau sapa barista"
+          : "Welcome inside · Click any table to sit or meet the barista"
+        : language === "id"
+        ? "Ketuk pintu kaca untuk masuk"
         : "Tap glass door to enter",
     });
   },
@@ -193,6 +266,7 @@ export const useCafeStore = create<CafeStoreState>((set, get) => ({
       activeSeat: seatId,
       seatedActivity: SEAT_ZONES[seatId].defaultActivity,
       activeDrawer: "seat_info",
+      showBaristaDialogue: false,
       analogVector: { x: 0, y: 0, active: false },
     }),
 
@@ -212,10 +286,33 @@ export const useCafeStore = create<CafeStoreState>((set, get) => ({
   setBaristaState: (baristaState) => set({ baristaState }),
 
   interactWithBarCounter: () =>
-    set({
+    set((s) => ({
       baristaState: "pouring_serving",
-      activeDrawer: "menu",
-      contextHint: "Barista is preparing Gaps Latte",
+      showBaristaDialogue: true,
+      contextHint:
+        s.language === "id"
+          ? "Ngobrol dengan barista atau coba pesan menu"
+          : "Chat with our barista or preview a menu item",
+    })),
+
+  orderMenuItemPreview: (menuId) => {
+    const item = CURATED_MENU.find((m) => m.id === menuId) ?? CURATED_MENU[0];
+    set((s) => ({
+      orderedItem: item,
+      baristaState: "pouring_serving",
+      activeDrawer: "none",
+      showBaristaDialogue: true,
+      contextHint:
+        s.language === "id"
+          ? `Barista sedang menyiapkan ${item.name}`
+          : `Barista is freshly preparing ${item.name}`,
+    }));
+  },
+
+  dismissBaristaDialogue: () =>
+    set({
+      showBaristaDialogue: false,
+      baristaState: "idle_brewing",
     }),
 
   setLightingMood: (lightingMood) => set({ lightingMood }),
@@ -223,6 +320,8 @@ export const useCafeStore = create<CafeStoreState>((set, get) => ({
   setActiveDrawer: (activeDrawer) =>
     set((state) => ({
       activeDrawer,
+      showBaristaDialogue:
+        activeDrawer !== "none" ? false : state.showBaristaDialogue,
       baristaState:
         activeDrawer === "none" && state.baristaState === "pouring_serving"
           ? "idle_brewing"
