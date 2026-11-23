@@ -1,39 +1,22 @@
-# SMALL GAPS Coffee BSD - Interactive 3D & WebAR Landing Page
+# SMALL GAPS Coffee BSD - Editorial Landing Page (Next.js + Framer Motion)
 
-Solo, 100% free-tier interactive 3D and WebAR showcase built for **SMALL GAPS Coffee (Hotel Starlet BSD, 2nd Floor, Tangerang)**. Designed to drive brand awareness and 1-tap WhatsApp reservations (`+62 818-199-099`) with simple, elegant, modern English copywriting.
+Fast, mobile-first, 100% free-tier editorial landing page built for **SMALL GAPS Coffee (Hotel Starlet BSD, 2nd Floor, Tangerang)** using **Next.js (App Router) + TypeScript + Framer Motion + Tailwind CSS v4 + Zustand** and real venue photography.
 
-## Key Features Implemented
+## Highlights
+- **Moody Industrial Editorial Hero:** Real bar photography with Framer Motion scroll-parallax and 4-time-of-day atmosphere grading (`Morning`, `Midday`, `Sunset`, `Night`).
+- **Interactive Real-Photo Space Explorer:** Clickable hotspots (`Indoor WFC`, `Espresso Bar`, `2F Terrace`) + `Work (WFC) / Hangout / Solo Coffee` selector + dynamic pre-filled WhatsApp booking (`+62 818-199-099`).
+- **Editorial Menu & Barista Order Preview:** Real signature photography (`Gaps Latte`, `Elixavida Thermos`, `Pineapple Apple Strudel`), animated category filters, and warm barista preview reactions.
+- **4-Step 2F Wayfinding Guide:** Visual step-by-step directions from Hotel Starlet BSD front steps -> twin escalators -> 2F orange arch -> SMALL GAPS Terrace, plus Gading Serpong (Dec 2026) announcement.
+- **Verified Google Reviews (5.0 / 271)** + optional official Google Places API sync script (`scripts/sync-google-reviews.mjs`).
+- **Bilingual `EN | ID` + Web Audio Cafe Ambience + Scoped Barista Chat** (strictly bounded to SMALL GAPS BSD, zero paid API keys).
 
-- **Hero Front-Facade View:** Clean default English HUD (`Menu`, `Location`, `Reserve`, `Open 08:00-22:00 WIB`, and high-contrast `Explore Space` CTA).
-- **Game-Style Free-Roam Controls:** Translucent mobile virtual analog joystick (bottom-left) + right-side touch look drag, plus desktop `WASD` + mouse drag, bounded by lightweight axis-separated AABB collision clamping.
-- **Clickable Interactive Objects:** Click/tap the front glass door (`Door_Main`) to animate it open/closed and unlock entry; click seating zones (`Indoor WFC Table`, `Lounge & Group Corner`, `Window Counter Seat`) for GSAP camera glides and seat-specific WhatsApp booking; click the Espresso Bar or Barista for 3-state reactive animations (`idle_brewing`, `greeting_wave`, `pouring_serving`) and the curated menu drawer.
-- **4-Time-of-Day Dynamic Ambience:** Instant smooth transitions between `Morning` (08:00), `Midday` (12:00), `Sunset` (17:00), and `Night` (20:00) without heavy duplicate lightmaps.
-- **Free-Tier WebAR & iOS Fallback:** Automatic detection routing Android Chrome to `@react-three/xr` WebXR and iOS Safari to Apple Quick Look (`.usdz`).
-
-## Local Setup & Run
+## Quickstart
 
 ```bash
 npm install
 npm run dev
 ```
 
-Open `http://localhost:3000` in your browser.
+## Deploy Free on Vercel
 
-## Verification Commands
-
-```bash
-npm run typecheck
-npm run test
-npm run build
-```
-
-## Deploy Free on Vercel (Zero Monthly Cost)
-
-1. Push this repository to GitHub.
-2. Import the repository at [vercel.com/new](https://vercel.com/new) using the **Hobby (Free)** tier.
-3. Keep default Next.js build settings (`next build`) and click **Deploy**.
-4. Region is pre-configured to `sin1` (Singapore) in `vercel.json` for low latency across BSD / Jabodetabek.
-
-## Swapping Real Blender `.glb` / `.usdz` Assets
-
-See `docs/ASSET_SWAP_GUIDE.md` for the exact Blender mesh naming contract, Mixamo 3-clip barista export steps, and Draco/KTX2 `< 8 MB` compression pipeline.
+Push to GitHub and import into [vercel.com/new](https://vercel.com/new) on the Hobby (Free) tier. Region is pre-configured to `sin1` (Singapore) in `vercel.json`.

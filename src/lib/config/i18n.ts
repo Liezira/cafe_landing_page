@@ -3,106 +3,93 @@ export type UiLanguage = "en" | "id";
 export const UI_COPY: Record<
   UiLanguage,
   {
-    openLabel: string;
-    closedLabel: string;
-    menu: string;
-    location: string;
-    reserve: string;
-    exploreSpace: string;
-    exit: string;
-    viewInAr: string;
-    viewInArMobile: string;
-    liteMode: string;
-    backTo3d: string;
-    skipToCafe: string;
-    startFromHotel: string;
-    tppToFpp: string;
-    fppToTpp: string;
-    soundOn: string;
-    soundOff: string;
+    navSpace: string;
+    navMenu: string;
+    navFind: string;
+    navReviews: string;
+    navReserve: string;
+    heroHours: string;
+    heroTitle: string;
+    heroSub: string;
+    ctaExplore: string;
+    ctaBarista: string;
+    spaceKicker: string;
+    spaceTitle: string;
+    spaceDesc: string;
+    visitMode: string;
+    ctaReserveSpot: string;
+    menuKicker: string;
     menuTitle: string;
-    menuSub: string;
-    orderPreview: string;
-    orderOrReserveWa: string;
-    reserveThisSpot: string;
-    standUp: string;
-    newStoreTitle: string;
-    newStoreDesc: string;
-    baristaWelcome: string;
+    askBaristaPrepare: string;
+    wayfindingKicker: string;
+    wayfindingTitle: string;
+    reviewsTitle: string;
     baristaPlaceholder: string;
-    baristaQuickQuestions: string[];
+    baristaQuick: string[];
   }
 > = {
   en: {
-    openLabel: "Open · 08:00-22:00 WIB",
-    closedLabel: "Opens 08:00 WIB",
-    menu: "Menu",
-    location: "Location",
-    reserve: "Reserve",
-    exploreSpace: "Explore Space",
-    exit: "Exit",
-    viewInAr: "View in AR",
-    viewInArMobile: "View in AR (Mobile)",
-    liteMode: "Lite View",
-    backTo3d: "Return to 3D",
-    skipToCafe: "Skip to Cafe (2F)",
-    startFromHotel: "Start from Hotel",
-    tppToFpp: "TPP · FPP",
-    fppToTpp: "FPP · TPP",
-    soundOn: "Mute cafe ambience",
-    soundOff: "Play cafe ambience",
-    menuTitle: "Daily Comfort Menu",
-    menuSub: "No Alcohol · No Pork · No Lard · Tap any item to preview at bar",
-    orderPreview: "Order Preview at Bar",
-    orderOrReserveWa: "Order or Reserve on WhatsApp",
-    reserveThisSpot: "Reserve This Spot on WhatsApp",
-    standUp: "Stand Up",
-    newStoreTitle: "Coming Soon: Gading Serpong",
-    newStoreDesc: "Expanding with a new store in December 2026.",
-    baristaWelcome:
-      "Welcome up to the 2nd floor! Ask me anything about SMALL GAPS Coffee BSD, or pick a menu item to watch me prepare it at the bar.",
+    navSpace: "Space",
+    navMenu: "Menu",
+    navFind: "Find 2F",
+    navReviews: "Reviews (5.0)",
+    navReserve: "Reserve",
+    heroHours: "Open Daily · 08:00-22:00 WIB",
+    heroTitle: "A modern hideaway above BSD Boulevard.",
+    heroSub:
+      "Warm timber, dark industrial tones, and daily comfort coffee on the 2nd floor of Hotel Starlet BSD. Explore our corners, taste the 5-minute Gaps Latte, and reserve your table in one tap.",
+    ctaExplore: "Explore the Space",
+    ctaBarista: "Chat with Barista",
+    spaceKicker: "Interactive Space Preview",
+    spaceTitle: "Pick your corner before you arrive.",
+    spaceDesc:
+      "Tap any spot below to inspect real photography of our indoor WFC tables, main espresso bar, or 2nd-floor brick-bench terrace.",
+    visitMode: "How are you visiting?",
+    ctaReserveSpot: "Reserve This Spot on WhatsApp",
+    menuKicker: "Daily Comfort Coffee & Food",
+    menuTitle: "Crafted to be savored in person.",
+    askBaristaPrepare: "Ask Barista to Prepare",
+    wayfindingKicker: "Finding Our 2nd-Floor Hideaway",
+    wayfindingTitle: "Four easy turns from Hotel Starlet BSD.",
+    reviewsTitle: "Loved by BSD regulars.",
     baristaPlaceholder: "Ask about SMALL GAPS menu, WFC, or hours...",
-    baristaQuickQuestions: [
+    baristaQuick: [
       "What's your best seller?",
       "Is it good for WFC?",
-      "No pork / alcohol?",
-      "How do I get here?",
+      "No pork or alcohol?",
+      "How do I get to 2F?",
     ],
   },
   id: {
-    openLabel: "Buka · 08.00-22.00 WIB",
-    closedLabel: "Buka 08.00 WIB",
-    menu: "Menu",
-    location: "Lokasi",
-    reserve: "Reservasi",
-    exploreSpace: "Jelajahi Ruang",
-    exit: "Keluar",
-    viewInAr: "Lihat di AR",
-    viewInArMobile: "Mode AR (HP)",
-    liteMode: "Mode Ringan",
-    backTo3d: "Kembali ke 3D",
-    skipToCafe: "Langsung ke Kafe (Lt. 2)",
-    startFromHotel: "Mulai dari Hotel",
-    tppToFpp: "TPP · FPP",
-    fppToTpp: "FPP · TPP",
-    soundOn: "Matikan suara kafe",
-    soundOff: "Nyalakan suasana kafe",
-    menuTitle: "Menu Harian SMALL GAPS",
-    menuSub: "No Alcohol · No Pork · No Lard · Ketuk menu untuk lihat penyajian",
-    orderPreview: "Coba Pesan di Bar",
-    orderOrReserveWa: "Pesan atau Reservasi via WhatsApp",
-    reserveThisSpot: "Reservasi Meja Ini via WhatsApp",
-    standUp: "Berdiri",
-    newStoreTitle: "Segera Hadir: Gading Serpong",
-    newStoreDesc: "Cabang baru SMALL GAPS hadir Desember 2026.",
-    baristaWelcome:
-      "Selamat datang di lantai 2! Tanya apa saja soal SMALL GAPS Coffee BSD, atau pilih menu untuk lihat saya racik langsung di bar.",
+    navSpace: "Ruang",
+    navMenu: "Menu",
+    navFind: "Rute Lt. 2",
+    navReviews: "Ulasan (5.0)",
+    navReserve: "Reservasi",
+    heroHours: "Buka Setiap Hari · 08.00-22.00 WIB",
+    heroTitle: "Tempat singgah hangat di lantai dua BSD Boulevard.",
+    heroSub:
+      "Perpaduan kayu jati hangat, nuansa industrial gelap, dan kopi nyaman di Hotel Starlet BSD Lt. 2. Intip sudut duduknya, rasakan Gaps Latte 5 menit, dan reservasi lewat WhatsApp.",
+    ctaExplore: "Intip Suasana Ruang",
+    ctaBarista: "Ngobrol dengan Barista",
+    spaceKicker: "Pratinjau Ruang Interaktif",
+    spaceTitle: "Pilih sudut duduk favoritmu sebelum datang.",
+    spaceDesc:
+      "Ketuk area di bawah untuk melihat foto asli meja WFC indoor, bar espresso utama, atau teras balkon bata terakota lantai 2.",
+    visitMode: "Rencana kunjunganmu?",
+    ctaReserveSpot: "Reservasi Sudut Ini via WhatsApp",
+    menuKicker: "Daily Comfort Coffee & Food",
+    menuTitle: "Diracik untuk dinikmati langsung di tempat.",
+    askBaristaPrepare: "Minta Barista Siapkan",
+    wayfindingKicker: "Panduan Menuju Lantai 2",
+    wayfindingTitle: "Empat langkah mudah dari depan Hotel Starlet BSD.",
+    reviewsTitle: "Disukai para penikmat kopi BSD.",
     baristaPlaceholder: "Tanya soal menu, tempat WFC, atau jam buka...",
-    baristaQuickQuestions: [
+    baristaQuick: [
       "Menu andalannya apa?",
       "Enak buat WFC?",
       "No pork & alcohol?",
-      "Rute ke sini gimana?",
+      "Rute ke Lt. 2 gimana?",
     ],
   },
 };

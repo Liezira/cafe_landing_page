@@ -1,56 +1,11 @@
-/* ==========================================================================
-   SMALL GAPS Coffee BSD - 3-Layer Design Token System (Nia UI/UX Spec)
-   Primitive -> Semantic -> Component (WCAG 2.2 AA/AAA verified)
-   ========================================================================== */
 :root {
-  /* Layer 1: Primitives */
-  --sg-espresso-950: #14110f;
-  --sg-espresso-900: #1f1a17;
-  --sg-espresso-800: #2e2722;
-  --sg-taupe-600: #574d45;
-  --sg-taupe-400: #8c7e73;
-  --sg-foam-300: #d8cec2;
-  --sg-milk-200: #eae2d6;
-  --sg-milk-100: #f2ece1;
-  --sg-oat-50: #faf7f2;
-
-  --sg-caramel-700: #8a4a1f;
-  --sg-caramel-500: #a65e2e;
-  --sg-crema-300: #e5a970;
-  --sg-botanical-700: #1b5e3a;
-  --sg-botanical-600: #1f6e43;
-  --sg-sage-300: #6ee7a8;
-
-  --sg-glass-dark-78: rgba(20, 17, 15, 0.78);
-  --sg-glass-dark-88: rgba(20, 17, 15, 0.88);
-  --sg-glass-dark-56: rgba(20, 17, 15, 0.56);
-  --sg-glass-border: rgba(250, 247, 242, 0.16);
-  --sg-glass-border-strong: rgba(250, 247, 242, 0.3);
-
-  /* Layer 2: Semantics */
-  --surface-hud: var(--sg-glass-dark-78);
-  --surface-hud-elevated: var(--sg-glass-dark-88);
-  --surface-hud-subtle: var(--sg-glass-dark-56);
-  --surface-sheet: var(--sg-oat-50);
-  --surface-card: var(--sg-milk-100);
-  --surface-cta-primary: var(--sg-oat-50);
-
-  --text-primary: var(--sg-espresso-950);
-  --text-secondary: var(--sg-taupe-600);
-  --text-on-glass: var(--sg-oat-50);
-  --text-on-glass-muted: var(--sg-foam-300);
-
-  --border-hud: var(--sg-glass-border);
-  --border-hud-focus: var(--sg-crema-300);
-  --border-sheet: var(--sg-milk-200);
-
-  --accent-caramel: var(--sg-caramel-700);
-  --accent-crema-light: var(--sg-crema-300);
-  --status-open-dot: var(--sg-sage-300);
-  --action-whatsapp: var(--sg-botanical-700);
-  --action-whatsapp-hover: #154c2e;
-
-  /* Layer 3: Components */
-  --joystick-size: 116px;
-  --joystick-knob-size: 44px;
+  --espresso: #14110f;
+  --charcoal: #1c1917;
+  --oat: #faf7f2;
+  --milk: #f2ece1;
+  --border-light: #e7dfd3;
+  --caramel: #8a4a1f;
+  --crema: #e5a970;
+  --botanical: #1b5e3a;
+  --ease-spring: cubic-bezier(0.22, 1, 0.36, 1);
 }
