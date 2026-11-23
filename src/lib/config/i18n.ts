@@ -20,12 +20,14 @@ export const UI_COPY: Record<
     ctaReserveSpot: string;
     menuKicker: string;
     menuTitle: string;
-    askBaristaPrepare: string;
+    askPrepare: string;
     wayfindingKicker: string;
     wayfindingTitle: string;
+    newStoreNote: string;
     reviewsTitle: string;
+    baristaWelcome: string;
     baristaPlaceholder: string;
-    baristaQuick: string[];
+    baristaQuickQuestions: string[];
   }
 > = {
   en: {
@@ -48,12 +50,15 @@ export const UI_COPY: Record<
     ctaReserveSpot: "Reserve This Spot on WhatsApp",
     menuKicker: "Daily Comfort Coffee & Food",
     menuTitle: "Crafted to be savored in person.",
-    askBaristaPrepare: "Ask Barista to Prepare",
+    askPrepare: "Ask Barista to Prepare",
     wayfindingKicker: "Finding Our 2nd-Floor Hideaway",
     wayfindingTitle: "Four easy turns from Hotel Starlet BSD.",
+    newStoreNote: "Coming Soon: New Store in Gading Serpong (December 2026)",
     reviewsTitle: "Loved by BSD regulars.",
-    baristaPlaceholder: "Ask about SMALL GAPS menu, WFC, or hours...",
-    baristaQuick: [
+    baristaWelcome:
+      "Welcome up to the 2nd floor! Ask me anything about SMALL GAPS Coffee BSD, or tap a menu item to preview it.",
+    baristaPlaceholder: "Ask about SMALL GAPS menu, WFC, or 2F directions...",
+    baristaQuickQuestions: [
       "What's your best seller?",
       "Is it good for WFC?",
       "No pork or alcohol?",
@@ -80,12 +85,15 @@ export const UI_COPY: Record<
     ctaReserveSpot: "Reservasi Sudut Ini via WhatsApp",
     menuKicker: "Daily Comfort Coffee & Food",
     menuTitle: "Diracik untuk dinikmati langsung di tempat.",
-    askBaristaPrepare: "Minta Barista Siapkan",
-    wayfindingKicker: "Panduan Menuju Lantai 2",
+    askPrepare: "Minta Barista Racikkan",
+    wayfindingKicker: "Menuju Lantai Dua",
     wayfindingTitle: "Empat langkah mudah dari depan Hotel Starlet BSD.",
-    reviewsTitle: "Disukai para penikmat kopi BSD.",
-    baristaPlaceholder: "Tanya soal menu, tempat WFC, atau jam buka...",
-    baristaQuick: [
+    newStoreNote: "Segera Hadir: Cabang Baru Gading Serpong (Desember 2026)",
+    reviewsTitle: "Disukai para pengunjung setia BSD.",
+    baristaWelcome:
+      "Selamat datang di lantai 2! Tanya apa saja soal SMALL GAPS Coffee BSD, atau ketuk menu untuk pratinjau racikan barista.",
+    baristaPlaceholder: "Tanya soal menu, tempat WFC, atau rute Lt. 2...",
+    baristaQuickQuestions: [
       "Menu andalannya apa?",
       "Enak buat WFC?",
       "No pork & alcohol?",

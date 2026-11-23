@@ -1,3 +1,5 @@
+"use client";
+
 import { MessageCircle } from "lucide-react";
 import { CAFE_INFO } from "@/lib/config/cafeData";
 import { buildWhatsAppUrl } from "@/lib/engine/whatsappLink";

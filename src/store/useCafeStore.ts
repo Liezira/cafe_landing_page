@@ -1,68 +1,56 @@
 import { create } from "zustand";
 import type {
-  ActivityId,
-  MenuCategory,
-  MoodId,
-  SpotId,
+  AtmosphereMood,
+  SpaceSpotId,
+  VisitActivity,
 } from "@/lib/config/cafeData";
 import type { UiLanguage } from "@/lib/config/i18n";
 import { cafeAmbienceAudio } from "@/lib/engine/cafeAudio";
 
-interface LandingStoreState {
-  mood: MoodId;
+export interface EditorialCafeStore {
+  mood: AtmosphereMood;
   language: UiLanguage;
   audioEnabled: boolean;
-  activeSpot: SpotId;
-  activeActivity: ActivityId;
-  activeCategory: MenuCategory;
-  wayfindingStep: number;
+  activeSpot: SpaceSpotId;
+  activeActivity: VisitActivity;
   baristaOpen: boolean;
-  orderedItemName: string | null;
+  baristaPromptItem: string | null;
 
-  setMood: (mood: MoodId) => void;
+  setMood: (mood: AtmosphereMood) => void;
   toggleLanguage: () => void;
   toggleAudio: () => void;
-  setActiveSpot: (spot: SpotId) => void;
-  setActiveActivity: (activity: ActivityId) => void;
-  setActiveCategory: (category: MenuCategory) => void;
-  setWayfindingStep: (step: number) => void;
-  openBarista: (orderedName?: string) => void;
+  setActiveSpot: (spot: SpaceSpotId) => void;
+  setActiveActivity: (activity: VisitActivity) => void;
+  openBarista: (itemName?: string) => void;
   closeBarista: () => void;
+  clearBaristaPromptItem: () => void;
 }
 
-export const useCafeStore = create<LandingStoreState>((set, get) => ({
+export const useCafeStore = create<EditorialCafeStore>((set, get) => ({
   mood: "sunset",
   language: "en",
   audioEnabled: false,
   activeSpot: "wfc",
   activeActivity: "wfc",
-  activeCategory: "all",
-  wayfindingStep: 0,
   baristaOpen: false,
-  orderedItemName: null,
+  baristaPromptItem: null,
 
   setMood: (mood) => set({ mood }),
-
   toggleLanguage: () =>
     set((s) => ({ language: s.language === "en" ? "id" : "en" })),
-
   toggleAudio: () => {
     const next = !get().audioEnabled;
     if (next) cafeAmbienceAudio.start();
     else cafeAmbienceAudio.stop();
     set({ audioEnabled: next });
   },
-
   setActiveSpot: (activeSpot) => set({ activeSpot }),
   setActiveActivity: (activeActivity) => set({ activeActivity }),
-  setActiveCategory: (activeCategory) => set({ activeCategory }),
-  setWayfindingStep: (wayfindingStep) => set({ wayfindingStep }),
-
-  openBarista: (orderedName) =>
+  openBarista: (itemName) =>
     set({
       baristaOpen: true,
-      orderedItemName: orderedName ?? null,
+      baristaPromptItem: itemName ?? null,
     }),
-
   closeBarista: () => set({ baristaOpen: false }),
+  clearBaristaPromptItem: () => set({ baristaPromptItem: null }),
 }));

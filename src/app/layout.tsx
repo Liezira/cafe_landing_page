@@ -17,15 +17,14 @@ const jakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "SMALL GAPS Coffee BSD | Daily Comfort Coffee & All-Day Dining",
+  title: "SMALL GAPS Coffee BSD | Daily Comfort Coffee & All Day Dining",
   description:
-    "A modern hideaway on the 2nd floor of Hotel Starlet BSD. Warm timber, dark industrial tones, 5-minute Gaps Latte, and easy WhatsApp table reservations.",
+    "A modern hideaway on the 2nd floor of Hotel Starlet BSD. Explore our corners, taste the 5-minute Gaps Latte, and reserve your table via WhatsApp.",
 };
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  viewportFit: "cover",
   themeColor: "#14110F",
 };
 
@@ -34,7 +33,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${fraunces.variable} ${jakarta.variable}`}>
-      <body className="min-h-dvh w-full overflow-x-hidden antialiased selection:bg-[#E5A970]/30 selection:text-[#FAF7F2]">
+      <body className="min-h-dvh bg-[#14110F] text-[#FAF7F2] antialiased selection:bg-[#E5A970]/30">
         {children}
       </body>
     </html>
